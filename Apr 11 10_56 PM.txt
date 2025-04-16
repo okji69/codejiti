@@ -1,0 +1,2367 @@
+--------------------------------#Prac-1-----------------------------------------------------------------
+#include <bits/stdc++.h>
+using namespace std;
+#define pb push_back
+
+void solve()
+{
+      cout << "Enter Initial number of vertices :"<<endl;;
+      int n;
+      cin >> n;
+      cout << "Enter Initial number of edges :"<<endl;;
+      int m;
+      cin >> m;
+      vector<vector<int>> edges;
+      cout << "Enter all the edges :"<<endl;;
+      for (int i = 0; i < m; i++)
+      {
+            int x, y,w;
+            cin >> x >> y>>w;
+            edges.pb({x, y, w});
+      }
+
+      vector<vector<int>> v(n + 1, vector<int>(n + 1));
+      cout << "Enter choice 1 for directed and 2 for undirected :"<<endl;;
+      int c;
+      cin >> c;
+      for (int i = 0; i < m; i++)
+      {
+            if (c == 1)
+            {
+                  v[edges[i][0]][edges[i][1]] = edges[i][2];
+            }
+            else
+            {
+                  v[edges[i][0]][edges[i][1]] = edges[i][2];
+                  v[edges[i][1]][edges[i][0]] = edges[i][2];
+            }
+      }
+
+      int maxEdges = (c == 1 ? n * (n - 1) : n * (n - 1) / 2);
+      cout<<maxEdges<<endl;
+      if (m > maxEdges/2)    cout << "The Graph is Dense" << endl;
+      else if(m < maxEdges/2) cout << "The Graph is Sparse" << endl;
+      else cout << "The Graph is neither Dense nor Sparse" << endl;
+
+      cout << "Matrix representation of given graph" << endl;
+      for (int i = 0; i <= n; i++)
+      {
+            for (int j = 0; j <= n; j++)
+            {
+                  cout << v[i][j] << " ";
+            }
+            cout << endl;
+      }
+
+      std::vector<std::pair<int,int>> adj[n+1];
+    
+      for (int i = 0; i < m; i++)
+      {
+            if (c == 1)
+            {
+                  adj[edges[i][0]].push_back({edges[i][1] , edges[i][2]});
+            }
+            else
+            {
+                  adj[edges[i][0]].push_back({edges[i][1] , edges[i][2]});
+                  adj[edges[i][1]].push_back({edges[i][0] , edges[i][2]});
+            }
+      }
+
+      cout << "Adjacency List representation of given Graph" << endl;
+      for (int i = 0; i <= n; i++)
+      {
+            cout << i << "----> ";
+            for (int j = 0; j < adj[i].size(); j++)
+            {
+                cout << adj[i][j].first << " " << adj[i][j].second << "\n";
+            }
+            cout << endl;
+      }
+
+      cout << "Incidence matrix representation of given Graph" << endl;
+      vector<vector<int>> ince(n + 1, vector<int>(m, 0));
+      for (int j = 0; j < m; j++)
+      {
+            int u = edges[j][0];
+            int v = edges[j][1];
+            int w = edges[j][2];
+            ince[u][j] = w;
+            ince[v][j] = (c == 1) ? -w : w;
+      }
+
+      for (int i = 0; i <= n; i++)
+      {
+            for (int j = 0; j < m; j++)
+            {
+                  cout << ince[i][j] << " ";
+            }
+            cout << endl;
+      }
+
+
+      size_t adjMatrixMemory = (n + 1) * (n + 1) * sizeof(int);
+      size_t adjListMemory = 0;
+      for (int i = 0; i <= n; i++)
+      {
+            adjListMemory += adj[i].size() * sizeof(int);
+      }
+      adjListMemory += (n + 1) * sizeof(vector<int>);
+      size_t incidenceMatrixMemory = (n + 1) * m * sizeof(int);
+      size_t edgeListMemory = m * 2 * sizeof(int);
+
+      cout << "Memory Utilization:" << endl;
+      cout << "Adjacency Matrix ((n + 1) * (n + 1) * sizeof(int)) :" << adjMatrixMemory << " bytes" << endl;
+      cout << "Adjacency List: 3(sum of (size of each adjacency list) * sizeof(int) + (n + 1) * sizeof(vector<int>)) :" << adjListMemory << " bytes" << endl;
+      cout << "Incidence Matrix: (Incidence Matrix Memory = (n + 1) * m * sizeof(int)) :" << incidenceMatrixMemory << " bytes" << endl;
+
+
+      while (true)
+      {
+            cout << "Enter your choice " << endl;
+            cout << "case 1: New edge add" << endl;
+            cout << "case 2: remove edge" << endl;
+            cout << "case 3: exit" << endl;
+            int choice;
+            cin >> choice;
+            if (choice == 1)
+            {
+                  cout << "Enter edge you want to add:" << endl;
+                  int x, y , w;
+                  cin >> x >> y >> w;
+                  if (c == 1)
+                  {
+                        v[x][y] = w;
+                        adj[x].push_back({y,w});
+                  }
+                  else
+                  {
+                        v[x][y] = w;
+                        v[y][x] = w;
+                        adj[x].push_back({y,w});
+                        adj[y].push_back({x,w});
+                  }
+            }
+            else if (choice == 2)
+            {
+                  cout << "Enter edge you want to remove:" << endl;
+                  int x, y , w;
+                  cin >> x >> y >> w;
+                  if (c == 1)
+                  {
+                        v[x][y] = 0;
+                        
+                        for(int i=0;i<adj[x].size();i++){
+                            if(adj[x][i].first == y){
+                                adj[x].erase(adj[x].begin()+i);
+                                break;
+                            }
+                        }
+                        for(int i=0;i<adj[y].size();i++){
+                            if(adj[y][i].first == x){
+                                adj[y].erase(adj[y].begin()+i);
+                                break;
+                            }
+                        }
+                    
+                  }
+                  else
+                  {
+                        v[x][y] = 0;
+                        v[y][x] = 0;
+                        for(int i=0;i<adj[x].size();i++){
+                           if(adj[x][i].first == y){
+                               adj[x].erase(adj[x].begin()+i);
+                               break;
+                           }
+                        }                       
+                        for(int i=0;i<adj[y].size();i++){
+                           if(adj[y][i].first == x){
+                               adj[y].erase(adj[y].begin()+i);
+                               break;
+                           }
+                        }                       
+                  }
+            }
+            else if (choice == 3)
+            {
+                  break;
+            }
+            else
+            {
+                  cout << "Invalid choice";
+            }
+
+            cout << "Matrix representation of graph after modification" << endl;
+            for (int i = 0; i <= n; i++)
+            {
+                  for (int j = 0; j <= n; j++)
+                  {
+                        cout << v[i][j] << " ";
+                  }
+                  cout << endl;
+            }
+            cout << "Adjacency List representation of given Graph" << endl;
+            for (int i = 0; i <= n; i++)
+            {
+                  cout << i << "----> ";
+                  for (int j = 0; j < adj[i].size(); j++)
+                  {
+                        cout << adj[i][j].first << " " << adj[i][j].second << "\n";
+                  }
+                  cout << endl;
+            }
+      }
+}
+
+signed main()
+{
+      ios::sync_with_stdio(0);
+      cin.tie(0);
+      cout.tie(0);
+      int t;
+      t = 1;
+      while (t--)
+      {
+            solve();
+            
+      }
+}
+    
+--------------------------------------------------------------------------#Prac-2-----------------------------------------------------
+#include <bits/stdc++.h>
+using namespace std;
+
+void displayMenu() {
+    cout << "\n===== Graph Operations Menu =====\n";
+    cout << "1. Union\n";
+    cout << "2. Intersection\n";
+    cout << "3. Difference (G1 - G2)\n";
+    cout << "4. Difference (G2 - G1)\n";
+    cout << "5. Symmetric Difference (Ring Sum)\n";
+    cout << "6. Complement of G1\n";
+    cout << "7. Complement of G2\n";
+    cout << "8. Fusion\n";
+    cout << "9. Decomposition\n";
+    cout << "10. Delete Edge\n";
+    cout << "11. Delete Vertex\n";
+    cout << "12. Exit\n";
+    cout << "Enter your choice: ";
+}
+
+void computeUnion(const vector<tuple<string, int, int>> &G1, const vector<tuple<string, int, int>> &G2) {
+    set<tuple<string, int, int>> edges;
+    vector<tuple<string, int, int>> unionGraph = G1;
+
+    for (auto &edge : G1) {
+        edges.insert(edge);
+    }
+
+    for (auto &edge : G2) {
+        if (edges.find(edge) == edges.end()) {
+            unionGraph.push_back(edge);
+            edges.insert(edge);
+        }
+    }
+
+    cout << "\nUnion of G1 and G2:\n";
+    for (auto &edge : unionGraph) {
+        cout << get<0>(edge) << " " << get<1>(edge) << " " << get<2>(edge) << "\n";
+    }
+}
+
+void computeIntersection(const vector<tuple<string, int, int>> &G1, const vector<tuple<string, int, int>> &G2) {
+    set<tuple<string, int, int>> edgesG1(G1.begin(), G1.end());
+    vector<tuple<string, int, int>> intersectionGraph;
+
+    for (auto &edge : G2) {
+        if (edgesG1.find(edge) != edgesG1.end()) {
+            intersectionGraph.push_back(edge);
+        }
+    }
+
+    cout << "\nIntersection of G1 and G2:\n";
+    for (auto &edge : intersectionGraph) {
+        cout << get<0>(edge) << " " << get<1>(edge) << " " << get<2>(edge) << "\n";
+    }
+}
+
+void computeDifference(const vector<tuple<string, int, int>> &G1, const vector<tuple<string, int, int>> &G2, const string &name) {
+    set<tuple<string, int, int>> edgesG2(G2.begin(), G2.end());
+    vector<tuple<string, int, int>> differenceGraph;
+
+    for (auto &edge : G1) {
+        if (edgesG2.find(edge) == edgesG2.end()) {
+            differenceGraph.push_back(edge);
+        }
+    }
+
+    cout << "\nDifference (" << name << "):\n";
+    for (auto &edge : differenceGraph) {
+        cout << get<0>(edge) << " " << get<1>(edge) << " " << get<2>(edge) << "\n";
+    }
+}
+
+void computeSymmetricDifference(const vector<tuple<string, int, int>> &G1, const vector<tuple<string, int, int>> &G2) {
+    set<tuple<string, int, int>> edgesG1(G1.begin(), G1.end());
+    set<tuple<string, int, int>> edgesG2(G2.begin(), G2.end());
+    vector<tuple<string, int, int>> symDiffGraph;
+
+    for (auto &edge : G1) {
+        if (edgesG2.find(edge) == edgesG2.end()) {
+            symDiffGraph.push_back(edge);
+        }
+    }
+
+    for (auto &edge : G2) {
+        if (edgesG1.find(edge) == edgesG1.end()) {
+            symDiffGraph.push_back(edge);
+        }
+    }
+
+    cout << "\nSymmetric Difference of G1 and G2:\n";
+    for (auto &edge : symDiffGraph) {
+        cout << get<0>(edge) << " " << get<1>(edge) << " " << get<2>(edge) << "\n";
+    }
+}
+
+void computeComplement(const vector<tuple<string, int, int>> &graph, int vertices, const string &name, bool isDirected) {
+    set<pair<int, int>> edges;
+    vector<tuple<string, int, int>> complementGraph;
+
+    for (auto &edge : graph) {
+        edges.insert({get<1>(edge), get<2>(edge)});
+        if (!isDirected) {
+            edges.insert({get<2>(edge), get<1>(edge)});
+        }
+    }
+
+    for (int i = 1; i <= vertices; ++i) {
+        for (int j = 1; j <= vertices; ++j) {
+            if (i != j && edges.find({i, j}) == edges.end()) {
+                complementGraph.push_back({name + "_C", i, j});
+            }
+        }
+    }
+
+    cout << "\nComplement of " << name << ":\n";
+    for (auto &edge : complementGraph) {
+        cout << get<0>(edge) << " " << get<1>(edge) << " " << get<2>(edge) << "\n";
+    }
+}
+
+void fusionGraph(vector<tuple<string, int, int>> &graph, int v1, int v2) {
+    for (auto &edge : graph) {
+        if (get<1>(edge) == v2) get<1>(edge) = v1;
+        if (get<2>(edge) == v2) get<2>(edge) = v1;
+    }
+    cout << "\nFusion complete. Vertex " << v2 << " merged into " << v1 << ".\n";
+}
+
+void decomposeGraph(const vector<tuple<string, int, int>> &graph) {
+    map<int, vector<pair<string, int>>> adj;
+    for (auto &edge : graph) {
+        adj[get<1>(edge)].push_back({get<0>(edge), get<2>(edge)});
+    }
+
+    cout << "\nDecomposed Graph:\n";
+    for (auto &[vertex, edges] : adj) {
+        cout << "Vertex " << vertex << ":";
+        for (auto &[label, neighbor] : edges) {
+            cout << " (" << label << ", " << neighbor << ")";
+        }
+        cout << "\n";
+    }
+}
+
+void deleteEdge(vector<tuple<string, int, int>> &graph, int u, int v) {
+    graph.erase(remove_if(graph.begin(), graph.end(), [u, v](const tuple<string, int, int> &edge) {
+        return get<1>(edge) == u && get<2>(edge) == v;
+    }), graph.end());
+    cout << "\nEdge (" << u << ", " << v << ") deleted.\n";
+}
+
+void deleteVertex(vector<tuple<string, int, int>> &graph, int vertex) {
+    graph.erase(remove_if(graph.begin(), graph.end(), [vertex](const tuple<string, int, int> &edge) {
+        return get<1>(edge) == vertex || get<2>(edge) == vertex;
+    }), graph.end());
+    cout << "\nVertex " << vertex << " and its associated edges deleted.\n";
+}
+
+int main() {
+    int edges1, edges2, vertices1, vertices2, choice;
+    bool isDirected;
+    vector<tuple<string, int, int>> graph1, graph2;
+
+    cout << "Graph Type (1 = Undirected, 2 = Directed): ";
+    cin >> choice;
+    isDirected = (choice == 2);
+
+    cout << "\nEnter number of vertices in G1: ";
+    cin >> vertices1;
+    cout << "Enter number of edges in G1: ";
+    cin >> edges1;
+    cout << "Enter edges for G1 (name u v):\n";
+    for (int i = 0; i < edges1; ++i) {
+        string name;
+        int u, v;
+        cin >> name >> u >> v;
+        graph1.push_back({name, u, v});
+    }
+
+    cout << "\nEnter number of vertices in G2: ";
+    cin >> vertices2;
+    cout << "Enter number of edges in G2: ";
+    cin >> edges2;
+    cout << "Enter edges for G2 (name u v):\n";
+    for (int i = 0; i < edges2; ++i) {
+        string name;
+        int u, v;
+        cin >> name >> u >> v;
+        graph2.push_back({name, u, v});
+    }
+
+    while (true) {
+        displayMenu();
+        cin >> choice;
+        switch (choice) {
+            case 1: computeUnion(graph1, graph2); break;
+            case 2: computeIntersection(graph1, graph2); break;
+            case 3: computeDifference(graph1, graph2, "G1 - G2"); break;
+            case 4: computeDifference(graph2, graph1, "G2 - G1"); break;
+            case 5: computeSymmetricDifference(graph1, graph2); break;
+            case 6: computeComplement(graph1, vertices1, "G1", isDirected); break;
+            case 7: computeComplement(graph2, vertices2, "G2", isDirected); break;
+            case 8: {
+                int v1, v2;
+                cout << "Enter two vertices to fuse (v1 v2): ";
+                cin >> v1 >> v2;
+                fusionGraph(graph1, v1, v2);
+                break;
+            }
+            case 9: decomposeGraph(graph1); break;
+            case 10: {
+                int u, v;
+                cout << "Enter edge to delete (u v): ";
+                cin >> u >> v;
+                deleteEdge(graph1, u, v);
+                break;
+            }
+            case 11: {
+                int vertex;
+                cout << "Enter vertex to delete: ";
+                cin >> vertex;
+                deleteVertex(graph1, vertex);
+                break;
+            }
+            case 12: cout << "Exiting...\n"; return 0;
+            default: cout << "Invalid choice!\n";
+        }
+    }
+}
+
+
+-----------------------------------------------------------#Prac-3------------------------------------------------------------------
+#include<bits/stdc++.h>
+using namespace std;
+
+int main() {
+    cout << "Enter the details for Graph 1:\n";
+    cout << "Enter the number of nodes and edges (n m): ";
+    int n, m;
+    cin >> n >> m;
+
+    vector<int> adj[n + 1];
+    vector<pair<int, vector<int>>> isoCheck;
+    vector<int> deg(n + 1, 0);
+
+    cout << "Enter the edges (u v):\n";
+    for (int i = 0; i < m; i++) {
+        int u, v;
+        cin >> u >> v;
+        deg[u]++;
+        deg[v]++;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+
+    for (int i = 1; i <= n; i++) {
+        int node = deg[i];
+        vector<int> adjDeg;
+        for (auto it : adj[i]) {
+            adjDeg.push_back(deg[it]);
+        }
+        sort(adjDeg.begin(), adjDeg.end());
+        isoCheck.push_back({node, adjDeg});
+    }
+    sort(isoCheck.begin(), isoCheck.end());
+
+    cout << "\nEnter the details for Graph 2:\n";
+    cout << "Enter the number of nodes and edges (n2 m2): ";
+    int n2, m2;
+    cin >> n2 >> m2;
+
+    vector<int> adj2[n2 + 1];
+    vector<pair<int, vector<int>>> isoCheck2;
+    vector<int> deg2(n2 + 1, 0);
+
+    cout << "Enter the edges (u v):\n";
+    for (int i = 0; i < m2; i++) {
+        int u, v;
+        cin >> u >> v;
+        deg2[u]++;
+        deg2[v]++;
+        adj2[u].push_back(v);
+        adj2[v].push_back(u);
+    }
+
+    for (int i = 1; i <= n2; i++) {
+        int node = deg2[i];
+        vector<int> adjDeg;
+        for (auto it : adj2[i]) {
+            adjDeg.push_back(deg2[it]);
+        }
+        sort(adjDeg.begin(), adjDeg.end());
+        isoCheck2.push_back({node, adjDeg});
+    }
+    sort(isoCheck2.begin(), isoCheck2.end());
+
+    cout << "\nGraph 1 node degrees and adjacent node degrees:\n";
+    for (auto it : isoCheck) {
+        cout << it.first << " : ";
+        for (auto itt : it.second) cout << itt << " ";
+        cout << endl;
+    }
+
+    cout << "\nGraph 2 node degrees and adjacent node degrees:\n";
+    for (auto it : isoCheck2) {
+        cout << it.first << " : ";
+        for (auto itt : it.second) cout << itt << " ";
+        cout << endl;
+    }
+
+    if (isoCheck == isoCheck2) {
+        cout << "\nGraphs are isomorphic\n";
+    } else {
+        cout << "\nGraphs are not isomorphic\n";
+    }
+
+    return 0;
+}
+
+
+--------------------------------------------------------#Prac-4---------------------------------------------------------------------------
+#include <bits/stdc++.h>
+using namespace std;
+
+class Solution {
+public:
+    unordered_map<string, priority_queue<string, vector<string>, greater<string>>> graph;
+    vector<string> itinerary;
+
+    void dfs(string airport) {
+        while (!graph[airport].empty()) {
+            string next = graph[airport].top();
+            graph[airport].pop();
+            dfs(next);
+        }
+        itinerary.push_back(airport);
+    }
+
+    vector<string> findItinerary(vector<vector<string>>& tickets) {
+        for (auto& ticket : tickets) {
+            graph[ticket[0]].push(ticket[1]);
+        }
+
+        dfs("JFK");
+
+        reverse(itinerary.begin(), itinerary.end());
+        return itinerary;
+    }
+};
+
+int main() {
+    int n;
+    cout << "Enter the number of tickets: ";
+    cin >> n;
+
+    vector<vector<string>> tickets(n);
+    cout << "Enter the tickets (format: FROM TO):\n";
+    for (int i = 0; i < n; i++) {
+        string from, to;
+        cin >> from >> to;
+        tickets[i] = {from, to};
+    }
+
+    Solution sol;
+    vector<string> result = sol.findItinerary(tickets);
+
+    cout << "Itinerary: ";
+    for (const string& airport : result) {
+        cout << airport << " ";
+    }
+    cout << endl;
+
+    return 0;
+}
+
+--------------------------------------------------------------------#Prac-5--------------------------------------------------------------------------
+#include <bits/stdc++.h>
+using namespace std;
+
+#define pb push_back
+#define ll long long int
+
+bool cmp(pair<int,int> &a , pair<int , int> &b){
+    if(a.first > b.first) return true;
+    else if(a.first == b.first) return a.second < b.second;
+    return false;
+}
+
+bool havelHakimi(vector<int> deg, vector<vector<int>>& adjList) {
+    int n = deg.size();
+    vector<pair<int, int>> nodes;
+
+    for (int i = 0; i < n; i++) {
+        if (deg[i] < 0) return false;
+        if (deg[i] > 0)
+            nodes.pb({deg[i], i});
+    }
+
+    sort(nodes.begin(), nodes.end() , cmp);
+    adjList.resize(n);
+
+    // for(auto &i : nodes)
+    // cout << i.first << " " << i.second << "\n";
+
+    while (!nodes.empty()) {
+        int degree = nodes[0].first;
+        int u = nodes[0].second;
+        nodes.erase(nodes.begin());
+        
+        if (degree > nodes.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < degree; ++i) {
+            int d = nodes[i].first;
+            int v = nodes[i].second;
+
+            adjList[u].pb(v);
+            adjList[v].pb(u);
+            nodes[i].first--;
+        }
+
+        nodes.erase(remove_if(nodes.begin(), nodes.end(), [](pair<int, int> p) { return p.first == 0; }), nodes.end());
+        sort(nodes.begin(), nodes.end() , cmp);
+    }
+    
+    return true;
+}
+
+void solve() {
+    int n;
+    cin >> n;
+    vector<int> deg(n);
+
+    for (int i = 0; i < n; i++) {
+        cin >> deg[i];
+    }
+    
+    vector<vector<int>> adjList;
+    if (havelHakimi(deg, adjList)) {
+        cout << "Graph is possible. Adjacency List:\n";
+        for (int i = 0; i < adjList.size(); ++i) {
+            cout << i << ": ";
+            for (int neighbor : adjList[i]) {
+                cout << neighbor << " ";
+            }
+            cout << endl;
+        }
+    } else {
+        cout << "Graph is not possible with the given degree sequence.\n";
+    }
+}
+
+int main() {
+    solve();
+    return 0;
+}
+---------------------------------------------------------------------------------#Prac-6a(proofer code)--------------------------------------------------------------
+#include <bits/stdc++.h>
+#include <iostream>
+using namespace std;
+
+vector<int>getPrufer(vector<vector<int>>& tree, int n) {
+    vector<int> deg(n + 1, 0);
+    for (int i = 1; i <= n; i++) deg[i] = tree[i].size();
+    
+    set<int> leaves;
+    for (int i = 1; i <= n; i++) if (deg[i] == 1) leaves.insert(i);
+    
+    vector<int> code;
+    for (int i = 0; i < n - 2; i++) 
+    {
+        int leaf = *leaves.begin(); leaves.erase(leaf);
+        for (int nbr : tree[leaf]) 
+        {
+            if (deg[nbr] > 0) 
+            {
+                code.push_back(nbr);
+                if (--deg[nbr] == 1) leaves.insert(nbr);
+                break;
+            }
+        }
+        deg[leaf] = 0;
+    }
+    return code;
+}
+
+vector<vector<int>> buildTree(vector<int> code) {
+    int n = code.size() + 2;
+    vector<int> deg(n + 1, 1);
+    for (int x : code) deg[x]++;
+    
+    set<int> leaves;
+    for (int i = 1; i <= n; i++) if (deg[i] == 1) leaves.insert(i);
+    
+    vector<vector<int>> tree(n + 1);
+    for (int x : code) 
+    {
+        int leaf = *leaves.begin(); leaves.erase(leaf);
+        tree[leaf].push_back(x);
+        tree[x].push_back(leaf);
+        if (--deg[x] == 1) leaves.insert(x);
+    }
+    
+    int u = *leaves.begin(), v = *next(leaves.begin());
+    tree[u].push_back(v);
+    tree[v].push_back(u);
+    
+    return tree;
+}
+
+int main() {
+    int n;
+    cin >> n;
+    vector<vector<int>>tree(n + 1);
+    for (int i = 0, u, v; i < n - 1; i++) 
+    {
+        cin >> u >> v;
+        tree[u].push_back(v);
+        tree[v].push_back(u);
+    }
+    
+    vector<int> prufer = getPrufer(tree, n);
+    for (int x : prufer) cout << x << " ";
+    cout << endl;
+    
+    vector<vector<int>> newTree = buildTree(prufer);
+    for (int i = 1; i <= n; i++) 
+    {
+        cout << i << ": ";
+        for (int x : newTree[i]) cout << x << " ";
+        cout << endl;
+    }
+    return 0;
+}
+
+// 5
+// 1 2
+// 1 3
+// 3 4
+// 3 5
+
+------------------------------------------------------------------------------#Prac-6b(all spanning trees and minimum spanning tree)-----------------------------
+#include <bits/stdc++.h>
+#define pb push_back
+using namespace std;
+
+vector<vector<vector<int>>> allgraphs;
+
+void generateSubgraphs(int n, int m, vector<pair<int, int>> &edges)
+{
+  int total = (1 << m);
+  for (int i = 0; i < total; i++)
+  {
+    vector<vector<int>> graph(n);
+    for (int j = 0; j < m; j++)
+    {
+      if (i & (1 << j))
+      {
+        int u = edges[j].first;
+        int v = edges[j].second;
+        graph[u].pb(v);
+        graph[v].pb(u);
+      }
+    }
+    allgraphs.pb(graph);
+  }
+}
+
+bool check(int n, vector<vector<int>> &graph)
+{
+  int nc = 0, ec = 0, start = -1;
+  for (int i = 0; i < n; i++)
+  {
+    if (!graph[i].empty())
+    {
+      start = i;
+      break;
+    }
+  }
+  if (start == -1)
+  {
+    return false;
+  }
+  queue<int> q;
+  vector<bool> vis(n, false);
+  q.push(start);
+  vis[start] = true;
+  nc++;
+  while (!q.empty())
+  {
+    int node = q.front();
+    q.pop();
+    for (int v : graph[node])
+    {
+      ec++;
+      if (!vis[v])
+      {
+        vis[v] = true;
+        q.push(v);
+        nc++;
+      }
+    }
+  }
+  ec /= 2;
+  for (int i = 0; i < n; i++)
+  {
+    if (!graph[i].empty() && !vis[i])
+    {
+      return false;
+    }
+  }
+  return (nc == n && ec == n - 1);
+}
+void solve()
+{
+  int n, m;
+  cin >> n >> m;
+  vector<pair<int, int>> edges(m);
+  for (int i = 0; i < m; i++)
+  {
+    int x, y;
+    cin >> x >> y;
+    edges[i] = {x - 1, y - 1};
+  }
+  generateSubgraphs(n, m, edges);
+  int cnt = 0;
+  cout << "Total Subgraphs:" << allgraphs.size() << "\n";
+  for (int i = 0; i < allgraphs.size(); i++)
+  {
+    cout << "Subgraph " << i + 1 << ":\n";
+    for (int u = 0; u < n; u++)
+    {
+      if (!allgraphs[i][u].empty())
+      {
+        cout << "Node " << u + 1 << " -> ";
+        for (int v : allgraphs[i][u])
+        {
+          cout << v + 1 << " ";
+        }
+        cout << "\n";
+      }
+    }
+    if (check(n, allgraphs[i]))
+    {
+      cnt++;
+      cout << "YES\n";
+    }
+    else
+    {
+      cout << "NO\n";
+    }
+    cout << "------------------\n";
+  }
+  cout << cnt << endl;
+}
+signed main()
+{
+  ios::sync_with_stdio(0);
+  cin.tie(0);
+  cout.tie(0);
+  int t = 1;
+  while (t--)
+  {
+    solve();
+  }
+}
+
+// 3 3
+// 1 2
+// 2 3
+// 1 3
+
+---------------------------------------------------------------------Prac-7a(cut sets and cut vertex)----------------------------------------------------------------
+#include <bits/stdc++.h>
+using namespace std;
+
+vector<pair<int, int>> edges;
+int n, m;
+set<int> cutVertices;
+
+class DisjointSet {
+      vector<int> parent, size;
+public:
+      DisjointSet(int n) {
+            parent.resize(n);
+            size.resize(n, 1);
+            for (int i = 0; i < n; i++) parent[i] = i;
+      }
+      
+      int findUPar(int node) {
+            if (node == parent[node]) return node;
+            return parent[node] = findUPar(parent[node]);
+      }
+      
+      void unionBySize(int u, int v) {
+            int parentU = findUPar(u);
+            int parentV = findUPar(v);
+            if (parentU == parentV) return;
+            if (size[parentU] < size[parentV]) {
+                  parent[parentU] = parentV;
+                  size[parentV] += size[parentU];
+            } else {
+                  parent[parentV] = parentU;
+                  size[parentU] += size[parentV];
+            }
+      }
+};
+
+bool isConnected(vector<pair<int, int>> &remainingEdges, set<int> removedVertices = {}) {
+      DisjointSet ds(n);
+      vector<bool> available(n, true);
+      for (int v : removedVertices) available[v] = false;
+
+      for (auto &it : remainingEdges) {
+            if (available[it.first] && available[it.second]) {
+                  ds.unionBySize(it.first, it.second);
+            }
+      }
+
+      int components = 0;
+      for (int i = 0; i < n; i++) {
+            if (available[i] && ds.findUPar(i) == i) {
+                  components++;
+            }
+      }
+      return components == 1;
+}
+
+void findCutsets() {
+      int total_subsets = (1 << m);
+      vector<vector<pair<int, int>>> cutsets;
+      for (int mask = 1; mask < total_subsets; mask++) {
+            vector<pair<int, int>> remainingEdges;
+            for (int j = 0; j < m; j++) {
+                  if (!(mask & (1 << j))) {
+                        remainingEdges.push_back(edges[j]);
+                  }
+            }
+            if (!isConnected(remainingEdges)) {
+                  vector<pair<int, int>> cutset;
+                  for (int j = 0; j < m; j++) {
+                        if (mask & (1 << j)) {
+                              cutset.push_back(edges[j]);
+                        }
+                  }
+                  cutsets.push_back(cutset);
+            }
+      }
+      cout << "Total Cutsets: " << cutsets.size() << "\n";
+      for (int i = 0; i < cutsets.size(); i++) {
+            cout << "Cutset " << i + 1 << ": ";
+            for (auto edge : cutsets[i]) {
+                  cout << "(" << edge.first + 1 << "," << edge.second + 1 << ") ";
+            }
+            cout << "\n";
+      }
+}
+
+void findCutVertexCombinations() {
+      vector<int> cutVertexList(cutVertices.begin(), cutVertices.end());
+      int numCutVertices = cutVertexList.size();
+      vector<vector<int>> cutVertexCombinations;
+      int total_subsets = (1 << numCutVertices);
+
+      for (int mask = 1; mask < total_subsets; mask++) {
+            set<int> removedVertices;
+            for (int j = 0; j < numCutVertices; j++) {
+                  if (mask & (1 << j)) {
+                        removedVertices.insert(cutVertexList[j]);
+                  }
+            }
+            if (!isConnected(edges, removedVertices)) {
+                  vector<int> cutVertexSet;
+                  for (int v : removedVertices) {
+                        cutVertexSet.push_back(v);
+                  }
+                  cutVertexCombinations.push_back(cutVertexSet);
+            }
+      }
+
+      cout << "Total Cut Vertex Combinations: " << cutVertexCombinations.size() << "\n";
+      for (int i = 0; i < cutVertexCombinations.size(); i++) {
+            cout << "Cut Vertex Set " << i + 1 << ": ";
+            for (int v : cutVertexCombinations[i]) {
+                  cout << v + 1 << " ";
+            }
+            cout << "\n";
+      }
+}
+
+int main() {
+      ios::sync_with_stdio(0);
+      cin.tie(0);
+
+      cin >> n >> m;
+      for (int i = 0; i < m; i++) {
+            int u, v;
+            cin >> u >> v;
+            u--; v--;
+            cutVertices.insert(u);
+            cutVertices.insert(v);
+            edges.push_back({u, v});
+      }
+
+      findCutsets();
+      findCutVertexCombinations();
+
+      return 0;
+}
+
+// 4 4
+// 1 2
+// 2 3
+// 3 4
+// 1 4
+
+--------------------------------------------------------#Prac-7(B)(kerger's min cut)--------------------------------------------------------------------
+#include <bits/stdc++.h>
+using namespace std;
+
+class Graph
+{
+      int V, E;
+      vector<pair<int, int>> edges; 
+public:
+      Graph(int V, int E) : V(V), E(E) {}
+
+      void addEdge(int u, int v){
+            edges.push_back({u, v});
+      }
+
+      int findMinCut();
+      int findParent(vector<int> &parent, int i){
+            if (parent[i] == i)
+                  return i;
+            return parent[i] = findParent(parent, parent[i]);
+      }
+
+      void UnionBySize(vector<int> &parent, vector<int> &size, int u, int v){
+            int parentU = findParent(parent, u);
+            int parentV = findParent(parent, v);
+            if (parentU != parentV){
+                  if (size[parentU] > size[parentV])
+                        swap(parentU, parentV);
+                  parent[parentU] = parentV;
+                  size[parentV] += size[parentU];
+            }
+      }
+};
+
+int Graph::findMinCut()
+{
+      int minCut = INT_MAX;
+      srand(time(NULL));
+
+      for (int iter = 0; iter < V * V; iter++)
+      {
+            vector<int> parent(V), size(V, 1);
+            for (int i = 0; i < V; i++)
+                  parent[i] = i;
+
+            int remainingVertices = V;
+            vector<pair<int, int>> tempEdges = edges;
+
+            while (remainingVertices > 2)
+            {
+                  int randIdx = rand() % tempEdges.size();
+                  int u = tempEdges[randIdx].first;
+                  int v = tempEdges[randIdx].second;
+
+                  if (findParent(parent, u) != findParent(parent, v))
+                  {
+                        UnionBySize(parent, size, u, v);
+                        remainingVertices--;
+                  }
+                  tempEdges.erase(tempEdges.begin() + randIdx);
+            }
+
+            int currentCut = 0;
+            for(auto&e:edges)
+            {
+                  if (findParent(parent, e.first) != findParent(parent, e.second)){
+                        currentCut++;
+                  }
+            }
+            minCut=min(minCut, currentCut);
+      }
+      return minCut;
+}
+
+int main()
+{
+      int V, E;
+      cin >> V >> E;
+      Graph g(V, E);
+      for (int i = 0; i < E; i++)
+      {
+            int u, v;
+            cin >> u >> v;
+            g.addEdge(u - 1, v - 1);
+      }
+
+      cout << "Minimum Cut: " << g.findMinCut() << endl;
+      return 0;
+}
+
+
+
+// 4 5
+// 1 2
+// 2 3
+// 3 4
+// 4 1
+// 2 4
+
+-----------------------------------------------------------------------#Prac-8(elementary reduction)----------------------------------------------------------------------
+#include <bits/stdc++.h>
+using namespace std;
+
+class Graph {
+public:
+    int V, E;
+    vector<vector<int>> adj;
+
+    Graph(int V) {
+        this->V = V;
+        this->E = 0;
+        adj.resize(V);
+    }
+
+    void addEdge(int u, int v) {
+        if (u == v) return;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+        E++;
+    }
+
+    void removeDegree2Vertices() {
+        vector<bool> removed(V, false);
+        bool changed = true;
+
+        while (changed) {
+            changed = false;
+            for (int i = 0; i < V; i++) {
+                if (!removed[i] && adj[i].size() == 2) {
+                    int u = adj[i][0], v = adj[i][1];
+                    adj[u].erase(remove(adj[u].begin(), adj[u].end(), i), adj[u].end());
+                    adj[v].erase(remove(adj[v].begin(), adj[v].end(), i), adj[v].end());
+                    adj[u].push_back(v);
+                    adj[v].push_back(u);
+                    adj[i].clear();
+                    removed[i] = true;
+                    E--;
+                    changed = true;
+                }
+            }
+        }
+    }
+
+    bool hasK5() {
+        vector<int> nodes;
+        for (int i = 0; i < V; i++) {
+            if (adj[i].size() >= 4) nodes.push_back(i);
+        }
+        if (nodes.size() < 5) return false;
+
+        for (int a = 0; a < nodes.size(); a++) {
+            for (int b = a + 1; b < nodes.size(); b++) {
+                for (int c = b + 1; c < nodes.size(); c++) {
+                    for (int d = c + 1; d < nodes.size(); d++) {
+                        for (int e = d + 1; e < nodes.size(); e++) {
+                            vector<int> k5 = {nodes[a], nodes[b], nodes[c], nodes[d], nodes[e]};
+                            bool complete = true;
+                            for (int i = 0; i < 5 && complete; i++) {
+                                for (int j = i + 1; j < 5; j++) {
+                                    if (find(adj[k5[i]].begin(), adj[k5[i]].end(), k5[j]) == adj[k5[i]].end()) {
+                                        complete = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (complete) return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    bool hasK33() {
+        vector<int> left, right;
+        for (int i = 0; i < V; i++) {
+            if (adj[i].size() >= 3) {
+                (left.size() < 3 ? left : right).push_back(i);
+            }
+        }
+        if (left.size() < 3 || right.size() < 3) return false;
+
+        for (int i : left) {
+            for (int j : right) {
+                if (find(adj[i].begin(), adj[i].end(), j) == adj[i].end()) return false;
+            }
+        }
+        return true;
+    }
+
+    bool isPetersonGraph() {
+        if (V != 10 || E != 15) return false;
+        for (int i = 0; i < V; i++) {
+            if (adj[i].size() != 3) return false;
+        }
+
+        vector<int> color(V, -1);
+        queue<int> q;
+
+        for (int i = 0; i < V; i++) {
+            if (color[i] == -1) {
+                q.push(i);
+                color[i] = 0;
+                while (!q.empty()) {
+                    int node = q.front();
+                    q.pop();
+                    for (int ngh : adj[node]) {
+                        if (color[ngh] == -1) {
+                            color[ngh] = 1 - color[node];
+                            q.push(ngh);
+                        } else if (color[ngh] == color[node]) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    bool checkEulerFormula() {
+        return (E <= 3 * V - 6);
+    }
+
+    bool isPlanar() {
+        removeDegree2Vertices();
+        if (hasK5() || hasK33()) return false;
+        if (isPetersonGraph()) return false;
+        return checkEulerFormula();
+    }
+};
+
+int main() {
+    int V, E;
+    cout << "Enter number of vertices and edges: ";
+    cin >> V >> E;
+
+    Graph g(V);
+    cout << "Enter edges:\n";
+    for (int i = 0; i < E; i++) {
+        int u, v;
+        cin >> u >> v;
+        g.addEdge(u - 1, v - 1);
+    }
+
+    if (g.isPlanar())
+        cout << "Graph is Planar.\n";
+    else
+        cout << "Graph is Non-Planar.\n";
+
+    return 0;
+}
+
+--------------------------------------------------------------------#Prac-9(maximum clique)------------------------------------------------------
+#include <bits/stdc++.h>
+using namespace std;
+
+int V, E;
+vector<vector<int>>adj;
+vector<int> maxClique;
+bool isClique(vector<int>&sub) {
+    for (int i = 0; i < sub.size(); i++) 
+    {
+        for (int j = i + 1; j < sub.size(); j++) 
+        {
+            if (find(adj[sub[i]].begin(),adj[sub[i]].end(), sub[j]) == adj[sub[i]].end())
+                return false;
+        }
+    }
+    return true;
+}
+
+void findMaxClique(vector<int>&curr,int ind) {
+    if (curr.size()>maxClique.size() && isClique(curr)) 
+    {
+        maxClique=curr;
+    }
+    for (int i=ind;i<V;i++) 
+    {
+        curr.push_back(i);
+        findMaxClique(curr,i+1);
+        curr.pop_back();
+    }
+}
+
+int main() {
+    cout << "Enter number of vertices and edges: ";
+    cin >> V >> E;
+    adj.resize(V);
+    cout << "Enter edges:\n";
+    for (int i = 0; i < E; i++) 
+    {
+        int u, v;
+        cin >> u >> v;
+        adj[u - 1].push_back(v - 1);
+        adj[v - 1].push_back(u - 1);
+    }
+    vector<int>curr;
+    findMaxClique(curr,0);
+    cout << "Maximum Clique Size: " << maxClique.size() << "\nNodes in Maximum Clique: ";
+    for (int v : maxClique) 
+    {
+        cout << v + 1 << " ";
+    }
+    cout << endl;
+    return 0;
+}
+
+
+// 6 10
+// 1 2
+// 1 5
+// 1 6
+// 2 6
+// 2 5
+// 5 6
+// 2 3
+// 3 5
+// 3 4
+// 4 5
+
+---------------------------------------------------------------#Prac-10(the chromatic number)-------------------------------------------------
+#include <bits/stdc++.h>
+using namespace std;
+
+int V, E;
+vector<vector<int>> adj;
+bool isIsolatedGraph() 
+{
+    for (int i = 0; i < V; i++)
+        if (!adj[i].empty()) return false;
+    return true;
+}
+bool isCompleteGraph()
+{
+    return (E == (V * (V - 1)) / 2);
+}
+bool isBipartite() 
+{
+    vector<int> color(V, -1);
+    queue<int> q;
+    for (int start = 0; start < V; start++) {
+        if (color[start] == -1) { 
+            color[start] = 0;
+            q.push(start);
+            while (!q.empty()) {
+                int node = q.front();
+                q.pop();
+                for (int neighbor : adj[node]) {
+                    if (color[neighbor] == -1) {
+                        color[neighbor] = 1 - color[node];
+                        q.push(neighbor);
+                    } else if (color[neighbor] == color[node]) {
+                        return false; 
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}
+
+bool isStarGraph() 
+{
+    int center = -1;
+    for (int i = 0; i < V; i++) {
+        if (adj[i].size() == V - 1) {
+            if (center != -1) return false; 
+            center = i;
+        } else if (adj[i].size() != 1) return false;
+    }
+    return center != -1;
+}
+
+bool isCycleGraph() 
+{
+    return (E == V);
+}
+
+bool isWheelGraph() 
+{
+    if (E != 2 * (V - 1)) return false;
+    int center = -1;
+    for (int i = 0; i < V; i++) {
+        if (adj[i].size() == V - 1) center = i;
+    }
+    return (center != -1);
+}
+
+bool isPetersenGraph() 
+{
+    return (V == 10 && E == 15);
+}
+
+bool isPlanar() 
+{
+    int F = E - V + 2;
+    return (F >= 1 && E <= 3 * V - 6);
+}
+
+
+int bruteForceChromaticNumber() 
+{
+    vector<int> color(V, -1);
+    int maxColor = V;
+
+    function<bool(int, int)> validColor = [&](int node, int col) {
+        for (int neighbor : adj[node]) {
+            if (color[neighbor] == col) return false;
+        }
+        return true;
+    };
+
+    function<void(int)> backtrack = [&](int node) {
+        if (node == V) {
+            int usedColors = *max_element(color.begin(), color.end()) + 1;
+            maxColor = min(maxColor, usedColors);
+            return;
+        }
+
+        for (int col = 0; col < maxColor; col++) {
+            if (validColor(node, col)) {
+                color[node] = col;
+                backtrack(node + 1);
+                color[node] = -1;
+            }
+        }
+    };
+
+    backtrack(0);
+    return maxColor;
+}
+
+int main() {
+    cout << "Enter number of vertices and edges: ";
+    cin >> V >> E;
+    adj.resize(V);
+
+    cout << "Enter edges:\n";
+    for (int i = 0; i < E; i++) {
+        int u, v;
+        cin >> u >> v;
+        adj[u - 1].push_back(v - 1);
+        adj[v - 1].push_back(u - 1);
+    }
+
+    if (isIsolatedGraph()) {
+        cout << "Graph is Isolated. Chromatic Number = " << V << endl;
+    } else if (isCompleteGraph()) {
+        cout << "Graph is Complete. Chromatic Number = " << V << endl;
+    } else if (isBipartite()) {
+        cout << "Graph is Bipartite. Chromatic Number = 2\n";
+    } else if (isStarGraph()) {
+        cout << "Graph is Star. Chromatic Number = 2\n";
+    } else if (isCycleGraph()) {
+        cout << "Graph is Cycle. Chromatic Number = " << (V % 2 == 0 ? 2 : 3) << endl;
+    } else if (isWheelGraph()) {
+        cout << "Graph is Wheel. Chromatic Number = " << (V % 2 == 0 ? 3 : 4) << endl;
+    } else if (isPlanar()) {
+        cout << "Graph is Planar. Chromatic Number ≤ 4\n";
+    } else if (isPetersenGraph()) {
+        cout << "Graph is Petersen. Chromatic Number = 3\n";
+    } else {
+        int chromaticNumber = bruteForceChromaticNumber();
+        cout << "Chromatic Number = " << chromaticNumber << endl;
+    }
+
+    return 0;
+}
+-====================================================================================================================================================================================================
+    
+  ---------------------------------------------------------------------MAX FLOW and MIN CUT-------------------------------------------------------------
+  
+  
+  #include <iostream>
+#include <vector>
+#include <queue>
+#include <climits>
+
+using namespace std;
+
+// Perform BFS to find if there is a path from source to sink
+bool bfs(vector<vector<int>>& residual, int s, int t, vector<int>& parent) {
+    int V = residual.size();
+    vector<bool> visited(V, false);
+    queue<int> q;
+
+    q.push(s);
+    visited[s] = true;
+    parent[s] = -1;
+
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+
+        for (int v = 0; v < V; ++v) {
+            if (!visited[v] && residual[u][v] > 0) {
+                parent[v] = u;
+                visited[v] = true;
+                q.push(v);
+                if (v == t) return true;
+            }
+        }
+    }
+    return false;
+}
+
+// DFS for finding the reachable vertices in residual graph after max flow
+void dfs(int u, vector<vector<int>>& residual, vector<bool>& visited) {
+    visited[u] = true;
+    for (int v = 0; v < residual.size(); ++v) {
+        if (residual[u][v] > 0 && !visited[v]) {
+            dfs(v, residual, visited);
+        }
+    }
+}
+
+int fordFulkerson(vector<vector<int>>& capacity, int s, int t) {
+    int V = capacity.size();
+    vector<vector<int>> residual = capacity;
+    vector<int> parent(V);
+    int maxFlow = 0;
+
+    while (bfs(residual, s, t, parent)) {
+        int pathFlow = INT_MAX;
+
+        // Find minimum residual capacity in the path
+        for (int v = t; v != s; v = parent[v]) {
+            int u = parent[v];
+            pathFlow = min(pathFlow, residual[u][v]);
+        }
+
+        // Update residual capacities
+        for (int v = t; v != s; v = parent[v]) {
+            int u = parent[v];
+            residual[u][v] -= pathFlow;
+            residual[v][u] += pathFlow;
+        }
+
+        maxFlow += pathFlow;
+    }
+
+    // Find vertices reachable from source in residual graph
+    vector<bool> visited(V, false);
+    dfs(s, residual, visited);
+
+    cout << "\nMinimum Cut Edges (from reachable to non-reachable):\n";
+    for (int u = 0; u < V; ++u) {
+        for (int v = 0; v < V; ++v) {
+            if (visited[u] && !visited[v] && capacity[u][v] > 0) {
+                cout << u << " - " << v << endl;
+            }
+        }
+    }
+
+    return maxFlow;
+}
+
+int main() {
+    int V, E;
+    cout << "Enter number of vertices and edges: ";
+    cin >> V >> E;
+
+    vector<vector<int>> capacity(V, vector<int>(V, 0));
+
+    cout << "Enter edges in format (from to capacity):\n";
+    for (int i = 0; i < E; ++i) {
+        int u, v, cap;
+        cin >> u >> v >> cap;
+        capacity[u][v] = cap; // directed edge from u to v
+    }
+
+    int source, sink;
+    cout << "Enter source and sink: ";
+    cin >> source >> sink;
+
+    int maxFlow = fordFulkerson(capacity, source, sink);
+    cout << "\nMaximum Flow: " << maxFlow << endl;
+
+    return 0;
+}
+
+------------------------------------------------------------------------------------EULER AND HAMILTON CIRCUIT---------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <cstring>
+using namespace std;
+
+int V, E;
+vector<vector<int>> graph;
+
+// ---------- For Eulerian Check ----------
+bool isConnectedUtil(int v, vector<bool> &visited) {
+    visited[v] = true;
+    for (int i = 0; i < V; i++) {
+        if (graph[v][i] && !visited[i])
+            isConnectedUtil(i, visited);
+    }
+    return true;
+}
+
+bool isConnected() {
+    vector<bool> visited(V, false);
+
+    // Find a vertex with a non-zero degree
+    int start = -1;
+    for (int i = 0; i < V; i++) {
+        int degree = 0;
+        for (int j = 0; j < V; j++)
+            degree += graph[i][j];
+        if (degree > 0) {
+            start = i;
+            break;
+        }
+    }
+
+    if (start == -1)
+        return true; // No edges
+
+    isConnectedUtil(start, visited);
+
+    for (int i = 0; i < V; i++) {
+        int degree = 0;
+        for (int j = 0; j < V; j++)
+            degree += graph[i][j];
+        if (degree > 0 && !visited[i])
+            return false;
+    }
+
+    return true;
+}
+
+bool isEulerian() {
+    if (!isConnected())
+        return false;
+
+    int odd = 0;
+    for (int i = 0; i < V; i++) {
+        int degree = 0;
+        for (int j = 0; j < V; j++)
+            degree += graph[i][j];
+        if (degree % 2 != 0)
+            odd++;
+    }
+
+    return (odd == 0); // Eulerian circuit
+}
+
+// ---------- For Hamiltonian Check ----------
+bool isHamiltonianUtil(vector<bool> &visited, vector<int> &path, int pos) {
+    if (pos == V) {
+        return graph[path[pos - 1]][path[0]] == 1; // Cycle back to start
+    }
+
+    for (int v = 1; v < V; v++) {
+        if (graph[path[pos - 1]][v] && !visited[v]) {
+            visited[v] = true;
+            path[pos] = v;
+
+            if (isHamiltonianUtil(visited, path, pos + 1))
+                return true;
+
+            visited[v] = false;
+        }
+    }
+
+    return false;
+}
+
+bool isHamiltonian() {
+    vector<int> path(V, -1);
+    vector<bool> visited(V, false);
+
+    path[0] = 0;
+    visited[0] = true;
+
+    return isHamiltonianUtil(visited, path, 1);
+}
+
+// ---------- Main ----------
+int main() {
+    cout << "Enter number of vertices and edges: ";
+    cin >> V >> E;
+
+    graph.assign(V, vector<int>(V, 0));
+
+    cout << "Enter edges (u v):" << endl;
+    for (int i = 0; i < E; i++) {
+        int u, v;
+        cin >> u >> v;
+        graph[u][v] = 1;
+        graph[v][u] = 1; // Undirected graph
+    }
+
+    if (isEulerian())
+        cout << "Graph is Eulerian." << endl;
+    else
+        cout << "Graph is NOT Eulerian." << endl;
+
+    if (isHamiltonian())
+        cout << "Graph is Hamiltonian." << endl;
+    else
+        cout << "Graph is NOT Hamiltonian." << endl;
+
+    return 0;
+}
+
+--------------------------------------------------------------------------------------Dijsktra AND Floyd Warshell------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <climits>
+#include <queue>
+using namespace std;
+
+const int INF = INT_MAX;
+
+void floydWarshall(vector<vector<int>>& dist, int V) {
+    for (int k = 0; k < V; ++k)
+        for (int i = 0; i < V; ++i)
+            for (int j = 0; j < V; ++j)
+                if (dist[i][k] != INF && dist[k][j] != INF)
+                    dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
+}
+
+vector<int> dijkstra(vector<vector<pair<int, int>>>& adj, int V, int src) {
+    vector<int> dist(V, INF);
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> pq;
+
+    dist[src] = 0;
+    pq.push({0, src});
+
+    while (!pq.empty()) {
+        auto [d, u] = pq.top(); pq.pop();
+
+        for (auto [v, w] : adj[u]) {
+            if (dist[u] + w < dist[v]) {
+                dist[v] = dist[u] + w;
+                pq.push({dist[v], v});
+            }
+        }
+    }
+
+    return dist;
+}
+
+int main() {
+    int V, E;
+    cout << "Enter number of vertices and edges: ";
+    cin >> V >> E;
+
+    // For Floyd-Warshall
+    vector<vector<int>> dist(V, vector<int>(V, INF));
+    // For Dijkstra
+    vector<vector<pair<int, int>>> adj(V);
+
+    cout << "Enter edges (u v weight):" << endl;
+    for (int i = 0; i < E; ++i) {
+        int u, v, w;
+        cin >> u >> v >> w;
+        dist[u][v] = w;
+        // For undirected graph, uncomment below
+        // dist[v][u] = w;
+        adj[u].emplace_back(v, w);
+        // For undirected graph, uncomment below
+        // adj[v].emplace_back(u, w);
+    }
+
+    // Initialize diagonal to zero
+    for (int i = 0; i < V; i++) dist[i][i] = 0;
+
+    // -------- Floyd-Warshall --------
+    floydWarshall(dist, V);
+    cout << "\nAll-pairs shortest distances (Floyd-Warshall):" << endl;
+    for (int i = 0; i < V; ++i) {
+        for (int j = 0; j < V; ++j) {
+            if (dist[i][j] == INF)
+                cout << "INF ";
+            else
+                cout << dist[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    // -------- Dijkstra's Algorithm --------
+    int src;
+    cout << "\nEnter source vertex for Dijkstra: ";
+    cin >> src;
+
+    vector<int> dijkstraDist = dijkstra(adj, V, src);
+    cout << "Shortest distances from vertex " << src << " (Dijkstra):" << endl;
+    for (int i = 0; i < V; ++i) {
+        if (dijkstraDist[i] == INF)
+            cout << "INF ";
+        else
+            cout << dijkstraDist[i] << " ";
+    }
+    cout << endl;
+
+    return 0;
+}
+---------------------------------------------------------------------------------------------No. of spanning TREE------------------------------------------------------
+
+#include <bits/stdc++.h>
+#define pb push_back
+using namespace std;
+
+vector<vector<vector<int>>> allgraphs;
+
+void generateSubgraphs(int n, int m, vector<pair<int, int>> &edges)
+{
+  int total = (1 << m);
+  for (int i = 0; i < total; i++)
+  {
+    vector<vector<int>> graph(n);
+    for (int j = 0; j < m; j++)
+    {
+      if (i & (1 << j))
+      {
+        int u = edges[j].first;
+        int v = edges[j].second;
+        graph[u].pb(v);
+        graph[v].pb(u);
+      }
+    }
+    allgraphs.pb(graph);
+  }
+}
+
+bool check(int n, vector<vector<int>> &graph)
+{
+  int nc = 0, ec = 0, start = -1;
+  for (int i = 0; i < n; i++)
+  {
+    if (!graph[i].empty())
+    {
+      start = i;
+      break;
+    }
+  }
+  if (start == -1)
+  {
+    return false;
+  }
+  queue<int> q;
+  vector<bool> vis(n, false);
+  q.push(start);
+  vis[start] = true;
+  nc++;
+  while (!q.empty())
+  {
+    int node = q.front();
+    q.pop();
+    for (int v : graph[node])
+    {
+      ec++;
+      if (!vis[v])
+      {
+        vis[v] = true;
+        q.push(v);
+        nc++;
+      }
+    }
+  }
+  ec /= 2;
+  for (int i = 0; i < n; i++)
+  {
+    if (!graph[i].empty() && !vis[i])
+    {
+      return false;
+    }
+  }
+  return (nc == n && ec == n - 1);
+}
+void solve()
+{
+  int n, m;
+  cin >> n >> m;
+  vector<pair<int, int>> edges(m);
+  for (int i = 0; i < m; i++)
+  {
+    int x, y;
+    cin >> x >> y;
+    edges[i] = {x - 1, y - 1};
+  }
+  generateSubgraphs(n, m, edges);
+  int cnt = 0;
+  cout << "Total Subgraphs:" << allgraphs.size() << "\n";
+  for (int i = 0; i < allgraphs.size(); i++)
+  {
+    cout << "Subgraph " << i + 1 << ":\n";
+    for (int u = 0; u < n; u++)
+    {
+      if (!allgraphs[i][u].empty())
+      {
+        cout << "Node " << u + 1 << " -> ";
+        for (int v : allgraphs[i][u])
+        {
+          cout << v + 1 << " ";
+        }
+        cout << "\n";
+      }
+    }
+    if (check(n, allgraphs[i]))
+    {
+      cnt++;
+      cout << "YES\n";
+    }
+    else
+    {
+      cout << "NO\n";
+    }
+    cout << "------------------\n";
+  }
+  cout << cnt << endl;
+}
+signed main()
+{
+  ios::sync_with_stdio(0);
+  cin.tie(0);
+  cout.tie(0);
+  int t = 1;
+  while (t--)
+  {
+    solve();
+  }
+}
+
+// 3 3
+// 1 2
+// 2 3
+// 1 3
+
+///////////////Write a program to apply four-color conjecture to the LAN topology represented graphically.//////////////////////////////////////
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+#define MAX_COLOR 4
+
+bool isSafe(int v, const vector<vector<int>>& graph, const vector<int>& color, int c) {
+    for (int i = 0; i < graph.size(); i++) {
+        if (graph[v][i] && color[i] == c)
+            return false;
+    }
+    return true;
+}
+
+bool graphColoringUtil(const vector<vector<int>>& graph, int m, vector<int>& color, int v) {
+    if (v == graph.size())
+        return true;
+
+    for (int c = 1; c <= m; c++) {
+        if (isSafe(v, graph, color, c)) {
+            color[v] = c;
+            if (graphColoringUtil(graph, m, color, v + 1))
+                return true;
+            color[v] = 0; // backtrack
+        }
+    }
+
+    return false;
+}
+
+void graphColoring(const vector<vector<int>>& graph) {
+    int V = graph.size();
+    vector<int> color(V, 0);
+
+    if (!graphColoringUtil(graph, MAX_COLOR, color, 0)) {
+        cout << "Solution does not exist using 4 colors.\n";
+        return;
+    }
+
+    cout << "Node Coloring Result:\n";
+    for (int i = 0; i < V; i++)
+        cout << "Node " << i << " ---> Color " << color[i] << "\n";
+}
+
+int main() {
+    int V, E;
+    cout << "Enter number of nodes: ";
+    cin >> V;
+    cout << "Enter number of edges: ";
+    cin >> E;
+
+    vector<vector<int>> graph(V, vector<int>(V, 0));
+
+    cout << "Enter " << E << " edges (node1 node2):\n";
+    for (int i = 0; i < E; i++) {
+        int u, v;
+        cin >> u >> v;
+        if (u >= V || v >= V || u < 0 || v < 0) {
+            cout << "Invalid edge! Node index should be between 0 and " << V - 1 << "\n";
+            i--; // retry this edge
+            continue;
+        }
+        graph[u][v] = 1;
+        graph[v][u] = 1; // Undirected graph
+    }
+
+    graphColoring(graph);
+
+    return 0;
+}
+
+------------------------------------------------------- 1,2 isomorphic ----------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+// Function to check adjacency equivalence under a mapping
+bool areIsomorphic(vector<vector<int>> &G1, vector<vector<int>> &G2, vector<int> &mapping) {
+    int n = G1.size();
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
+            if (G1[i][j] != G2[mapping[i]][mapping[j]])
+                return false;
+    return true;
+}
+
+// 1-Isomorphism: Check all permutations
+bool is1Isomorphic(vector<vector<int>> &G1, vector<vector<int>> &G2) {
+    int n = G1.size();
+    if (n != G2.size()) return false;
+
+    vector<int> perm(n);
+    for (int i = 0; i < n; ++i) perm[i] = i;
+
+    do {
+        if (areIsomorphic(G1, G2, perm)) return true;
+    } while (next_permutation(perm.begin(), perm.end()));
+
+    return false;
+}
+
+// Simplify a graph by removing vertices of degree 2 (used for 2-isomorphism)
+vector<vector<int>> simplifyGraph(vector<vector<int>> G) {
+    int n = G.size();
+    vector<vector<int>> newG(n, vector<int>(n, 0));
+    vector<bool> removed(n, false);
+    bool changed = true;
+
+    while (changed) {
+        changed = false;
+        for (int v = 0; v < n; ++v) {
+            if (removed[v]) continue;
+
+            vector<int> neighbors;
+            for (int u = 0; u < n; ++u)
+                if (G[v][u]) neighbors.push_back(u);
+
+            if (neighbors.size() == 2) {
+                int a = neighbors[0], b = neighbors[1];
+                if (!G[a][b]) {
+                    G[a][b] = G[b][a] = 1;
+                }
+                G[a][v] = G[v][a] = 0;
+                G[b][v] = G[v][b] = 0;
+                removed[v] = true;
+                changed = true;
+            }
+        }
+    }
+
+    for (int i = 0; i < n; ++i)
+        if (!removed[i])
+            for (int j = 0; j < n; ++j)
+                if (!removed[j] && G[i][j])
+                    newG[i][j] = 1;
+
+    return newG;
+}
+
+// 2-Isomorphism: Check after simplifying both graphs
+bool is2Isomorphic(vector<vector<int>> G1, vector<vector<int>> G2) {
+    auto S1 = simplifyGraph(G1);
+    auto S2 = simplifyGraph(G2);
+
+    return is1Isomorphic(S1, S2);
+}
+
+// Utility: Print adjacency matrix
+void printMatrix(vector<vector<int>> &G) {
+    for (auto &row : G) {
+        for (int val : row) cout << val << " ";
+        cout << endl;
+    }
+}
+
+int main() {
+    int n;
+    cout << "Enter number of vertices in the graphs: ";
+    cin >> n;
+
+    vector<vector<int>> G1(n, vector<int>(n));
+    vector<vector<int>> G2(n, vector<int>(n));
+
+    cout << "Enter adjacency matrix of Graph 1:\n";
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
+            cin >> G1[i][j];
+
+    cout << "Enter adjacency matrix of Graph 2:\n";
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
+            cin >> G2[i][j];
+
+    if (is1Isomorphic(G1, G2))
+        cout << "\nThe graphs are 1-Isomorphic (structurally identical).\n";
+    else
+        cout << "\nThe graphs are NOT 1-Isomorphic.\n";
+
+    if (is2Isomorphic(G1, G2))
+        cout << "The graphs are 2-Isomorphic (homeomorphic).\n";
+    else
+        cout << "The graphs are NOT 2-Isomorphic.\n";
+
+    return 0;
+}
+---------------------------------------------------------------------EDGE COVERIG AND VERTEX COVERING----------------------------------------------------------
+#include<bits/stdc++.h>
+using namespace std;
+
+class Graph {
+public:
+    int V;
+    vector<pair<int, int>> edges;
+    vector<vector<int>> adj;
+
+    Graph(int V) {
+        this->V = V;
+        adj.resize(V);
+    }
+
+    void addEdge(int u, int v) {
+        edges.push_back({u, v});
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+
+   // Check if set covers all edges
+   bool isVertexCover(int subset) {
+        for (auto e : edges) {
+            int u = e.first;
+            int v = e.second;
+            if (!((subset & (1 << u)) || (subset & (1 << v)))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Exact Minimum Vertex Cover
+    void vertexCoverExact() {
+        int minCoverSize = INT_MAX;
+        int bestSubset = 0;
+
+        int totalSubsets = (1 << V);
+        for (int subset = 0; subset < totalSubsets; ++subset) {
+            if (isVertexCover(subset)) {
+                int count = __builtin_popcount(subset); // count set bits
+                if (count < minCoverSize) {
+                    minCoverSize = count;
+                    bestSubset = subset;
+                }
+            }
+        }
+
+        cout << "Minimum Vertex Cover Size: " << minCoverSize << endl;
+        cout << "Vertices: ";
+        for (int i = 0; i < V; ++i) {
+            if (bestSubset & (1 << i))
+                cout << i << " ";
+        }
+        cout << endl;
+    }
+
+    // Edge Cover using Greedy Matching
+    void edgeCover() {
+        set<pair<int, int>> cover;
+        vector<bool> covered(V, false);
+
+        // Step 1: Take matching edges first
+        for (auto e : edges) {
+            int u = e.first;
+            int v = e.second;
+            if (!covered[u] && !covered[v]) {
+                cover.insert(e);
+                covered[u] = covered[v] = true;
+            }
+        }
+
+        // Step 2: If any vertex left, cover it
+        for (int u = 0; u < V; ++u) {
+            if (!covered[u] && !adj[u].empty()) {
+                int v = adj[u][0];
+                cover.insert({u, v});
+                covered[u] = covered[v] = true;
+            }
+        }
+
+        cout << "Edge Cover: ";
+        for (auto e : cover) cout << "(" << e.first << ", " << e.second << ") ";
+        cout << endl;
+    }
+};
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+
+    Graph g(n);
+
+    for (int i = 0; i < m; ++i) {
+        int u, v;
+        cin >> u >> v;
+        g.addEdge(u, v);
+    }
+
+    g.vertexCoverExact();
+    g.edgeCover();
+
+    return 0;
+}
+
+////////////////Write a program to check whether complete matching for bipartite graph exists or not.////////////////////////////////////////////
+#include <iostream>
+#include <vector>
+#include <cstring>
+using namespace std;
+
+const int MAXN = 1000;
+
+vector<int> adj[MAXN]; // adjacency list from left to right
+int matchTo[MAXN];     // right node i is matched to matchTo[i] (left)
+bool visited[MAXN];
+
+bool bpm(int u) {
+    for (int v : adj[u]) {
+        if (visited[v]) continue;
+        visited[v] = true;
+
+        // If v is not matched or we can rematch the previous one
+        if (matchTo[v] == -1 || bpm(matchTo[v])) {
+            matchTo[v] = u;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool isCompleteMatching(int leftSize, int rightSize) {
+    memset(matchTo, -1, sizeof(matchTo));
+
+    int matchCount = 0;
+    for (int u = 0; u < leftSize; ++u) {
+        memset(visited, 0, sizeof(visited));
+        if (bpm(u)) {
+            matchCount++;
+        }
+    }
+
+    // Complete matching if all left vertices are matched
+    return matchCount == leftSize;
+}
+
+int main() {
+    int leftSize, rightSize, edges;
+    cout << "Enter number of nodes on left and right sides: ";
+    cin >> leftSize >> rightSize;
+
+    cout << "Enter number of edges: ";
+    cin >> edges;
+
+    cout << "Enter edges (u v) where u in [0," << leftSize-1 << "] and v in [0," << rightSize-1 << "]:\n";
+    for (int i = 0; i < edges; ++i) {
+        int u, v;
+        cin >> u >> v;
+        adj[u].push_back(v);
+    }
+
+    if (isCompleteMatching(leftSize, rightSize)) {
+        cout << "✅ Complete Matching exists!\n";
+    } else {
+        cout << "❌ Complete Matching does NOT exist.\n";
+    }
+
+    return 0;
+}
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
