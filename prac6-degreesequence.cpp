@@ -1,34 +1,88 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
+#define pb push_back
+#define ll long long
+#define int long long int
+#define all(v) v.begin(), v.end()
 using namespace std;
-int main(){
-    int n;
-    cout<<"enter the size of degree sequence"<<endl;
-    cin>>n;
-    cout<<"enter the degree sequence code ";
-    multiset<int,greater<int>>s;
-    for(int i=0;i<n;i++){
-        int x;
-        cin>>x;
-        s.insert(x);
-    }
-    while(!s.empty()){
-        int x=*s.begin();
-        s.erase(s.begin());
-        if(x>s.size()){
-            cout<<"NOT POSSIBLE"<<endl;
-            return 0;
-        }
-        vector<int>v;
-        for(auto it:s){
-            x--;
-            v.push_back(it);
-            if(x==0){break;}
-        }
-        for(auto it:v){
-            s.erase(s.find(it));
-            if(it-1>0){s.insert(it-1);}
-        }
 
+bool f(vector<pair<int, int>> &v, vector<vector<int>> &adj)
+{
+  int n = v.size();
+  int flag = 0;
+  for (int i = 0; i < n; i++)
+  {
+    if (v[i].first < 0)
+    {
+      return false;
     }
-    cout<<"POSSIBLE"<<endl;
+    if (v[i].first == 0)
+    {
+      continue;
+    }
+    else
+    {
+      flag = 1;
+      break;
+    }
+  }
+  if (flag == 0)
+  {
+    return true;
+  }
+  sort(all(v));
+  reverse(all(v));
+  int k = v[0].first;
+  if (k >= n)
+  {
+    return false;
+  }
+  for (int i = 1; i <= k; i++)
+  {
+    v[i].first--;
+    adj[v[0].second][v[i].second] = 1;
+    adj[v[i].second][v[0].second] = 1;
+  }
+  v.erase(v.begin());
+  return f(v, adj);
+}
+
+signed main()
+{
+  ios::sync_with_stdio(0);
+  cin.tie(0);
+  cout.tie(0);
+  int n;
+  cin >> n;
+  vector<pair<int, int>> v;
+  int cnt = 0;
+  for (int i = 0; i < n; i++)
+  {
+    int x;
+    cin >> x;
+    v.pb({x, i + 1});
+    cnt += x;
+  }
+  vector<vector<int>> adj(n + 1, vector<int>(n + 1, 0));
+  if (cnt % 2 == 1)
+  {
+    cout << "NO" << endl;
+    return 0;
+  }
+  if (f(v, adj))
+  {
+    cout << "YES" << endl;
+    for (int i = 1; i <= n; i++)
+    {
+      for (int j = 1; j <= n; j++)
+      {
+        cout << adj[i][j] << " ";
+      }
+      cout << endl;
+    }
+    cout << endl;
+  }
+  else
+  {
+    cout << "NO" << endl;
+  }
 }
