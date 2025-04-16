@@ -150,3 +150,208 @@ int main() {
 
     return 0;
 }
+
+
+#include <bits/stdc++.h>
+using namespace std;
+
+void addEdge(vector<vector<int>> &adjList, int u, int v)
+{
+    if (u < adjList.size() && v < adjList.size())
+    {
+        adjList[u].push_back(v);
+        adjList[v].push_back(u);
+    }
+}
+
+void printGraph(const vector<vector<int>> &adjList)
+{
+    for (int i = 0; i < adjList.size(); i++)
+    {
+        cout << i << ": ";
+        for (int v : adjList[i])
+        {
+            cout << v << " ";
+        }
+        cout << endl;
+    }
+}
+
+vector<vector<int>> graphUnion(const vector<vector<int>> &g1, const vector<vector<int>> &g2)
+{
+    vector<vector<int>> result = g1;
+    for (int i = 0; i < g2.size(); i++)
+    {
+        for (int j : g2[i])
+        {
+            if (find(result[i].begin(), result[i].end(), j) == result[i].end())
+            {
+                result[i].push_back(j);
+            }
+        }
+    }
+    return result;
+}
+
+vector<vector<int>> graphIntersection(const vector<vector<int>> &g1, const vector<vector<int>> &g2)
+{
+    vector<vector<int>> result(g1.size());
+    for (int i = 0; i < g1.size(); i++)
+    {
+        for (int j : g1[i])
+        {
+            if (find(g2[i].begin(), g2[i].end(), j) != g2[i].end())
+            {
+                result[i].push_back(j);
+            }
+        }
+    }
+    return result;
+}
+
+vector<vector<int>> graphDifference(const vector<vector<int>> &g1, const vector<vector<int>> &g2)
+{
+    vector<vector<int>> result(g2.size());
+    for (int i = 0; i < g2.size(); i++)
+    {
+        for (int j : g2[i])
+        {
+            if (find(g1[i].begin(), g1[i].end(), j) == g1[i].end())
+            {
+                result[i].push_back(j);
+            }
+        }
+    }
+    return result;
+}
+
+vector<vector<int>> graphRingSum(const vector<vector<int>> &g1, const vector<vector<int>> &g2)
+{
+    vector<vector<int>> diff1 = graphDifference(g1, g2);
+    vector<vector<int>> diff2 = graphDifference(g2, g1);
+    return graphUnion(diff1, diff2);
+}
+
+vector<vector<int>> graphDecomposition(const vector<vector<int>> &graph)
+{
+    vector<vector<int>> result = graph;
+    if (find(result[0].begin(), result[0].end(), 1) != result[0].end())
+    {
+        result[0].erase(remove(result[0].begin(), result[0].end(), 1), result[0].end());
+        result[1].erase(remove(result[1].begin(), result[1].end(), 0), result[1].end());
+    }
+    return result;
+}
+
+void fusionOfVertices(vector<vector<int>> &graph, int u, int v)
+{
+    for (int neighbor : graph[v])
+    {
+        if (neighbor != u)
+        {
+            if (find(graph[u].begin(), graph[u].end(), neighbor) == graph[u].end())
+            {
+                graph[u].push_back(neighbor);
+            }
+            for (int &vertex : graph[neighbor])
+            {
+                if (vertex == v)
+                {
+                    vertex = u;
+                }
+            }
+        }
+    }
+    graph[v].clear();
+}
+
+int main()
+{
+    int n;
+    cout << "Enter number of vertices: ";
+    cin >> n;
+
+    vector<vector<int>> primaryGraph(n);
+    cout << "Enter edges for primary graph (-1 -1 to stop):\n";
+    while (true)
+    {
+        int u, v;
+        cin >> u >> v;
+        if (u == -1)
+            break;
+        addEdge(primaryGraph, u, v);
+    }
+
+    vector<vector<int>> secondaryGraph(n);
+    cout << "Enter edges for secondary graph (-1 -1 to stop):\n";
+    while (true)
+    {
+        int u, v;
+        cin >> u >> v;
+        if (u == -1)
+            break;
+        addEdge(secondaryGraph, u, v);
+    }
+
+    while (true)
+    {
+        cout << "1. Print primary graph\n";
+        cout << "2. Print secondary graph\n";
+        cout << "3. Union of graphs\n";
+        cout << "4. Intersection of graphs\n";
+        cout << "5. Difference (Primary - Secondary)\n";
+        cout << "6. Ring sum of graphs\n";
+        cout << "7. Decomposition of primary graph\n";
+        cout << "8. Fuse vertices\n";
+        cout << "9. Exit\n";
+        cout << "Enter choice: ";
+
+        int choice;
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            cout << "Primary Graph:\n";
+            printGraph(primaryGraph);
+            break;
+        case 2:
+            cout << "Secondary Graph:\n";
+            printGraph(secondaryGraph);
+            break;
+        case 3:
+            cout << "Union Result:\n";
+            printGraph(graphUnion(primaryGraph, secondaryGraph));
+            break;
+        case 4:
+            cout << "Intersection Result:\n";
+            printGraph(graphIntersection(primaryGraph, secondaryGraph));
+            break;
+        case 5:
+            cout << "Difference Result:\n";
+            printGraph(graphDifference(primaryGraph, secondaryGraph));
+            break;
+        case 6:
+            cout << "Ring Sum Result:\n";
+            printGraph(graphRingSum(primaryGraph, secondaryGraph));
+            break;
+        case 7:
+            cout << "Decomposition Result (splitting at vertices 0 and 1):\n";
+            printGraph(graphDecomposition(primaryGraph));
+            break;
+        case 8:
+            cout << "Enter vertices to fuse (u v): ";
+            int fu, fv;
+            cin >> fu >> fv;
+            fusionOfVertices(primaryGraph, fu, fv);
+            cout << "After fusion:\n";
+            printGraph(primaryGraph);
+            break;
+        case 9:
+            return 0;
+        default:
+            cout << "Invalid choice!\n";
+        }
+    }
+    return 0;
+}
