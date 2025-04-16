@@ -145,3 +145,113 @@ int main(){
 
     return 0;
 }
+
+
+
+/*
+Check whether graph is planar or not.
+
+1. If graph in disconnected, check each component separately.
+2. for each component, do the following:
+    a. remove all parallel edges and self-loops.
+    b. remove the vertices of degree 2 and replace them with a single edge.
+
+3. At last if only one edge is left, then the graph is planar.
+4. If more than one edge is left, then check the number of edges and vertices.
+5. check condition for planar graph:
+    a. if number of edges > 3 * number of vertices - 6, then the graph is not planar.
+    b. else further investigatation is needed.
+*/
+
+#include <bits/stdc++.h>
+using namespace std;
+
+bool isPlanar(vector<int> component, vector<vector<int>> graph)
+{
+
+    set<pair<int, int>> edges;
+    for (int i : component)
+    {
+        for (int j : graph[i])
+        {
+            if (i != j)
+            {
+                edges.insert({min(i, j), max(i, j)});
+            }
+        }
+    }
+
+    vector<int> newComponent;
+    for (auto edge : edges)
+    {
+        newComponent.push_back(edge.first);
+        newComponent.push_back(edge.second);
+    }
+
+    int n = newComponent.size();
+    int e = edges.size();
+
+    if (e > 3 * n - 6)
+        return false;
+
+    return true;
+}
+
+int main()
+{
+
+    int n, e;
+    cin >> n >> e;
+
+    vector<vector<int>> graph(n + 1);
+
+    for (int i = 0; i < n; i++)
+    {
+        int u, v;
+        cin >> u >> v;
+        graph[u].push_back(v);
+        graph[v].push_back(u);
+    }
+
+    vector<bool> visited(n + 1, false);
+    vector<vector<int>> components;
+
+    for (int i = 1; i <= n; i++)
+    {
+        if (!visited[i])
+        {
+            vector<int> component;
+            stack<int> s;
+            s.push(i);
+            visited[i] = true;
+            while (!s.empty())
+            {
+                int node = s.top();
+                s.pop();
+                component.push_back(node);
+                for (int j : graph[node])
+                {
+                    if (!visited[j])
+                    {
+                        visited[j] = true;
+                        s.push(j);
+                    }
+                }
+            }
+            components.push_back(component);
+        }
+    }
+
+    for (auto component : components)
+    {
+        bool res = isPlanar(component, graph);
+        if (!res)
+        {
+            cout << "Graph is not planar" << endl;
+            return 0;
+        }
+    }
+
+    cout << "Graph is planar" << endl;
+    return 0;
+}
